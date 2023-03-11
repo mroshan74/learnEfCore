@@ -1,5 +1,6 @@
 ﻿using Academy;
 using Academy.Database;
+using Academy.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -24,4 +25,12 @@ var options = new DbContextOptionsBuilder<ApplicationDbContext>()
     .Options;
 
 var dbContext = new ApplicationDbContext(options);
-    
+dbContext.Database.Migrate();
+
+var dbAct = new DbMethods(dbContext);
+
+dbAct.ProcessDelete();
+dbAct.ProcessInsert();
+dbAct.ProcessSelect();
+dbAct.ProcessUpdate(options);
+dbContext.Dispose();

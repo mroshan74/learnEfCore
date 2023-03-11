@@ -19,12 +19,24 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseMySql(Constants.dbString, ServerVersion.AutoDetect(Constants.dbString));
+        optionsBuilder
+            .UseMySql(Constants.dbString, ServerVersion.AutoDetect(Constants.dbString))
+            .EnableSensitiveDataLogging();
         base.OnConfiguring(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Student>().HasKey(e => e.Id);
+        modelBuilder.Entity<Address>().HasKey(e => e.Id);
+        modelBuilder.Entity<Class>().HasKey(e => e.Id);
+        modelBuilder.Entity<Professor>().HasKey(e => e.Id);
+
+        modelBuilder.Entity<Student>().HasOne(e => e.Address);
+        modelBuilder.Entity<Professor>().HasOne(e => e.Address);
+
+        modelBuilder.Entity<Class>().HasMany(e => e.Students).WithMany(e => e.Classes);
+        modelBuilder.Entity<Class>().HasOne(e => e.Professor).WithMany(e => e.Classes);
         
         base.OnModelCreating(modelBuilder);
     }
