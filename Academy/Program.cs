@@ -1,6 +1,8 @@
-﻿using Academy;
+﻿using System.Linq.Expressions;
+using Academy;
 using Academy.Database;
 using Academy.Models;
+using Academy.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -31,6 +33,25 @@ var dbAct = new DbMethods(dbContext);
 
 dbAct.ProcessDelete();
 dbAct.ProcessInsert();
-dbAct.ProcessSelect();
-dbAct.ProcessUpdate(options);
+// dbAct.ProcessSelect();
+// dbAct.ProcessUpdate(options);
 dbContext.Dispose();
+
+ProcessRepository();
+
+async void ProcessRepository()
+{
+    dbContext = new ApplicationDbContext(options);
+    var repository = new GenericRepository<Student>(dbContext);
+    
+    //simple select
+    var students = await repository.GetAsync(null, null);
+    var student = await repository.GetByIdAsync(students.First().Id);
+    
+    //includes
+    student = await repository.GetByIdAsync(student.Id, (student) => student.Address, (student) => student.Classes);
+    
+    //filters
+    Expression<Func<Student, bool>> filter = (student) => student.FirstName == "Man";
+    students = await repository.GetFilteredAsync(new[] { filter }, null, null);
+}
