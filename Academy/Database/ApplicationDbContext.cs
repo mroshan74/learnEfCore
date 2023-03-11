@@ -1,10 +1,12 @@
 ﻿using Academy.Models;
+using Academy.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace Academy;
+namespace Academy.Database;
 
 public class ApplicationDbContext : DbContext
 {
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
         
@@ -17,8 +19,13 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // var connectionString = 
-        // optionsBuilder
-        //     .UseMySql()
+        optionsBuilder.UseMySql(Constants.dbString, ServerVersion.AutoDetect(Constants.dbString));
+        base.OnConfiguring(optionsBuilder);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        
+        base.OnModelCreating(modelBuilder);
     }
 }

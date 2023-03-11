@@ -1,4 +1,6 @@
 ﻿using Academy;
+using Academy.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 /*
@@ -14,6 +16,12 @@ var builder = new ConfigurationBuilder()
     .AddJsonFile("appSettings.json", false);
 
 IConfigurationRoot configuration = builder.Build();
-var dbString = configuration[Constants.ConnectionString];
+// var dbString = configuration[Constants.ConnectionString];
+var dbString = configuration.GetConnectionString("DefaultSQLConnection");
 
-Console.WriteLine("db string: " + dbString);
+var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+    .UseMySql(dbString, ServerVersion.AutoDetect(dbString))
+    .Options;
+
+var dbContext = new ApplicationDbContext(options);
+    
